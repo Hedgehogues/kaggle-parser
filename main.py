@@ -57,8 +57,9 @@ class DataExtractor:
             if cond:
                 content = resp.content
                 break
-            print('Retry timeout', flush=True)
+            print(f'Retry timeout. Code: {code}', flush=True)
             time.sleep(self.ltimeout)
+            i += 1
         assert i < self.retries, self.__message(code=code, url=url)
         return content
 
