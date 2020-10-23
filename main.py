@@ -8,6 +8,9 @@ import tqdm as tqdm
 import requests
 
 
+proxies = {}
+
+
 class DataExtractor:
     def __init__(self, *, url, sc=200, ctags=2, itag=1, ignore_codes=None, rtimeout=10, retries=5):
         """
@@ -27,7 +30,7 @@ class DataExtractor:
         self.sc = sc
         self.ctags = ctags
         self.itag = itag
-        self.ignore_codes = {} if ignore_codes is None else ignore_codes
+        self.ignore_codes = {404} if ignore_codes is None else ignore_codes
         self.ltimeout = rtimeout
         self.retries = retries
 
@@ -46,7 +49,7 @@ class DataExtractor:
         code = None
         content = None
         while i < self.retries:
-            resp = requests.get(url)
+            resp = requests.get(url, proxies=proxies)
             code = resp.status_code
             if resp.status_code in self.ignore_codes:
                 print(url + ' in ignore codes', flush=True)
@@ -82,7 +85,7 @@ def lb_data(_id):
     return resp.json()
 
 
-timeout = 10
+timeout = 1
 url = 'https://www.kaggle.com/c/lyft-motion-prediction-autonomous-vehicles'
 
 path_to_data = f'data/{url.split("/")[-1]}'
