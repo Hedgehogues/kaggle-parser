@@ -82,8 +82,7 @@ def lb_data(_id):
     return resp.json()
 
 
-team_number = 0
-timeout = 2
+timeout = 10
 url = 'https://www.kaggle.com/c/lyft-motion-prediction-autonomous-vehicles'
 
 path_to_data = f'data/{url.split("/")[-1]}'
