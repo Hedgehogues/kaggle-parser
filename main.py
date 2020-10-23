@@ -9,7 +9,7 @@ import requests
 
 
 class DataExtractor:
-    def __init__(self, *, url, sc=200, ctags=2, itag=1, ignore_codes=None, ltimeout=10, retries=5):
+    def __init__(self, *, url, sc=200, ctags=2, itag=1, ignore_codes=None, rtimeout=10, retries=5):
         """
         Extract data from page of kaggle.com/*
 
@@ -18,7 +18,7 @@ class DataExtractor:
         :param ctags: expected count tags with scripts
         :param itag: tag index with data
         :param ignore_codes: ignore status codes of response
-        :param ltimeout: long timeout between retries
+        :param rtimeout: long timeout between retries
         :param retries: count retries after failed
         """
         self.__fkernel = 'push('
@@ -28,7 +28,7 @@ class DataExtractor:
         self.ctags = ctags
         self.itag = itag
         self.ignore_codes = {} if ignore_codes is None else ignore_codes
-        self.ltimeout = ltimeout
+        self.ltimeout = rtimeout
         self.retries = retries
 
     def __extract_info(self, *, tag):
@@ -83,6 +83,7 @@ def lb_data(_id):
 
 
 team_number = 0
+timeout = 2
 url = 'https://www.kaggle.com/c/lyft-motion-prediction-autonomous-vehicles'
 
 path_to_data = f'data/{url.split("/")[-1]}'
@@ -91,7 +92,7 @@ lb_info = lb_extractor(path='/leaderboard')
 _id = lb_info['competitionId']
 teams = lb_data(_id=_id)
 teams = teams['beforeUser'] + teams['afterUser']
-user_extractor = DataExtractor(url='https://www.kaggle.com')
+user_extractor = DataExtractor(url='https://www.kaggle.com', rtimeout=10)
 for t in tqdm.tqdm(teams, desc='team processing'):
     if os.path.exists(f'{path_to_data}/{t["teamId"]}.json'):
         print(f'{t["teamId"]} already exists', flush=True)
@@ -102,3 +103,4 @@ for t in tqdm.tqdm(teams, desc='team processing'):
         tm['userInfo'] = user_info
     with open(f'{path_to_data}/{team["teamId"]}.json', 'w') as fd:
         json.dump(team, fd)
+    time.sleep(timeout)
